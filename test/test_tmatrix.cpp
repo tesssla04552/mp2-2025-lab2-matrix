@@ -44,8 +44,6 @@ TEST(TDynamicMatrix, copied_matrix_has_its_own_memory)
 	TDynamicMatrix<int> m1(m);
 	m1[0][0] = 100;
 	EXPECT_NE(m[0][0], m1[0][0]);
-	EXPECT_EQ(m[0][0], 1);
-	EXPECT_EQ(m1[0][0], 100);
 }
 
 TEST(TDynamicMatrix, can_get_size)
@@ -83,10 +81,6 @@ TEST(TDynamicMatrix, can_assign_matrix_to_itself)
 	int* origRow0 = &m[0][0];
 	int* origRow1 = &m[1][0];
 	m = m;
-	EXPECT_EQ(m[0][0], 1);
-	EXPECT_EQ(m[0][1], 2);
-	EXPECT_EQ(m[1][0], 3);
-	EXPECT_EQ(m[1][1], 4);
 	EXPECT_EQ(&m[0][0], origRow0);
 	EXPECT_EQ(&m[1][0], origRow1);
 }

@@ -35,9 +35,19 @@ public:
   {
       if (sz > MAX_VECTOR_SIZE)
           throw out_of_range("Vector size exceeds maximum allowed size");
-      assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-      pMem = new T[sz];
-      std::copy(arr, arr + sz, pMem);
+      if (arr == nullptr)
+          throw invalid_argument("Source array cannot be nullptr");
+      pMem = new (std::nothrow) T[sz];
+      if (pMem == nullptr) {
+          throw std::bad_alloc();
+      }
+      try {
+          std::copy(arr, arr + sz, pMem);
+      }
+      catch (...) {
+          delete[] pMem;
+          throw;
+      }
   }
   TDynamicVector(const TDynamicVector& v) : sz(v.sz), pMem(new T[v.sz])
   {
@@ -53,26 +63,21 @@ public:
   ~TDynamicVector()
   {
       delete[] pMem;
+      pMem = nullptr;
   }
   TDynamicVector& operator=(const TDynamicVector& v)
   {
       if (this != &v) {
-          T* newMem = new T[v.sz];
-          std::copy(v.pMem, v.pMem + v.sz, newMem);
-          delete[] pMem;
-          pMem = newMem;
-          sz = v.sz;
+          TDynamicVector tmp(v);
+          swap(*this, tmp);
       }
       return *this;
   }
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
       if (this != &v) {
-          delete[] pMem;
-          sz = v.sz;
-          pMem = v.pMem;
-          v.sz = 0;
-          v.pMem = nullptr;
+          TDynamicVector tmp(v);
+          swap(*this, tmp);
       }
       return *this;
   }
@@ -225,7 +230,7 @@ public:
       return pMem[ind];
   }
   // сравнение
-  bool operator==(const TDynamicMatrix& m) noexcept
+  bool operator==(const TDynamicMatrix& m) const noexcept
   {
       if (sz != m.sz) return false;
       for (size_t i = 0; i < sz; i++) {
