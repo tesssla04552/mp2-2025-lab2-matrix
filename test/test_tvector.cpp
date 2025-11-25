@@ -197,7 +197,7 @@ TEST(TDynamicVector, can_multiply_vectors_with_equal_size)
 
 TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 {
-	TDynamicVector<int> v1(3), v2(5);
+	TDynamicVector<int> v1(1), v2(2);
 	ASSERT_ANY_THROW(v1 * v2);
 }
 
